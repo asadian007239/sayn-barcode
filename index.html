@@ -2,10 +2,11 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#0a0e27">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="تولیدکننده بارکد و QR Code آفلاین">
 <title>بارکد ساین</title>
 <link rel="manifest" href="manifest.json">
 <style>
@@ -69,10 +70,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .pitem{animation:fadeIn .3s ease-out}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
-@media(prefers-color-scheme:dark){body{background:var(--bg)}}
 </style>
-<script src="lib/JsBarcode.all.min.js"></script>
-<script src="lib/qrcode.min.js"></script>
 </head>
 <body>
 <div class="offbadge" id="offbadge">📡 آفلاین</div>
@@ -89,80 +87,111 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="search"><input type="text" id="fSearch" placeholder="🔍 جستجوی جنس..."></div>
 <div class="plist" id="plist"></div>
 </div>
-<div class="modal-ov" id="barcodeModal"><div class="modal"><h3>📊 بارکد</h3><div id="barcodeOutput"></div><div class="mlabel" id="barcodeLabel"></div><div class="macts"><button class="btn btn-p btn-sm" id="btnDownloadBC">📥 دانلود</button><button class="btn btn-s btn-sm" id="btnPrintBC">🖨️ چاپ</button><button class="btn btn-sm" id="btnCloseBC" style="background:#333;color:#fff">✖️ بستن</button></div></div></div>
-<div class="modal-ov" id="qrModal"><div class="modal"><h3>📱 QR Code</h3><div id="qrOutput"></div><div class="mlabel" id="qrLabel"></div><div class="macts"><button class="btn btn-p btn-sm" id="btnDownloadQR">📥 دانلود</button><button class="btn btn-sm" id="btnCloseQR" style="background:#333;color:#fff">✖️ بستن</button></div></div></div>
+<div class="modal-ov" id="barcodeModal"><div class="modal"><h3>📊 بارکد</h3><div id="barcodeOutput"></div><div class="mlabel" id="barcodeLabel"></div><div class="macts"><button class="btn btn-p btn-sm" id="btnDownloadBC">📥 دانلود PNG</button><button class="btn btn-s btn-sm" id="btnPrintBC">🖨️ چاپ</button><button class="btn btn-sm" id="btnCloseBC" style="background:#333;color:#fff">✖️ بستن</button></div></div></div>
+<div class="modal-ov" id="qrModal"><div class="modal"><h3>📱 QR Code</h3><div id="qrOutput"></div><div class="mlabel" id="qrLabel"></div><div class="macts"><button class="btn btn-p btn-sm" id="btnDownloadQR">📥 دانلود PNG</button><button class="btn btn-sm" id="btnCloseQR" style="background:#333;color:#fff">✖️ بستن</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
 'use strict';
+function svgToPngDataUrl(svg,cb){
+  var sd=new XMLSerializer().serializeToString(svg);
+  var buf=new TextEncoder().encode(sd);
+  try{
+    var blob=new Blob([buf],{type:'image/svg+xml;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var img=new Image();img.onload=function(){
+      var c=document.createElement('canvas');c.width=img.width*2;c.height=img.height*2;
+      var ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);cb(c.toDataURL('image/png'));
+    };img.onerror=function(){URL.revokeObjectURL(url);cb(null)};img.src=url;
+  }catch(e){cb(null)}
+}
 var SK='sayn_products';
 var products=[];
 var editingId=null;
 var currentBC=null,currentQR=null;
 function $(s){return document.querySelector(s)}
-function $$(s){return document.querySelectorAll(s)}
-var els={fName:$('#fName'),fPrice:$('#fPrice'),fCat:$('#fCat'),fBC:$('#fBC'),fStock:$('#fStock'),fSearch:$('#fSearch'),formTitle:$('#formTitle'),btnSave:$('#btnSave'),btnCancel:$('#btnCancel'),plist:$('#plist'),stTotal:$('#stTotal'),stCat:$('#stCat'),toast:$('#toast'),offbadge:$('#offbadge'),barcodeModal:$('#barcodeModal'),barcodeOutput:$('#barcodeOutput'),barcodeLabel:$('#barcodeLabel'),btnDownloadBC:$('#btnDownloadBC'),btnPrintBC:$('#btnPrintBC'),btnCloseBC:$('#btnCloseBC'),qrModal:$('#qrModal'),qrOutput:$('#qrOutput'),qrLabel:$('#qrLabel'),btnDownloadQR:$('#btnDownloadQR'),btnCloseQR:$('#btnCloseQR')};
-
+var els={};
+function init(){
+  els.fName=$('#fName');els.fPrice=$('#fPrice');els.fCat=$('#fCat');els.fBC=$('#fBC');els.fStock=$('#fStock');
+  els.fSearch=$('#fSearch');els.formTitle=$('#formTitle');els.btnSave=$('#btnSave');els.btnCancel=$('#btnCancel');
+  els.plist=$('#plist');els.stTotal=$('#stTotal');els.stCat=$('#stCat');els.toast=$('#toast');els.offbadge=$('#offbadge');
+  els.barcodeModal=$('#barcodeModal');els.barcodeOutput=$('#barcodeOutput');els.barcodeLabel=$('#barcodeLabel');
+  els.btnDownloadBC=$('#btnDownloadBC');els.btnPrintBC=$('#btnPrintBC');els.btnCloseBC=$('#btnCloseBC');
+  els.qrModal=$('#qrModal');els.qrOutput=$('#qrOutput');els.qrLabel=$('#qrLabel');
+  els.btnDownloadQR=$('#btnDownloadQR');els.btnCloseQR=$('#btnCloseQR');
+  load();render();updStats();els.offbadge.classList.remove('vis');
+  if(!navigator.onLine)els.offbadge.classList.add('vis');
+  window.addEventListener('online',function(){els.offbadge.classList.remove('vis')});
+  window.addEventListener('offline',function(){els.offbadge.classList.add('vis')});
+}
 function load(){try{products=JSON.parse(localStorage.getItem(SK)||'[]')}catch(e){products=[]}}
 function save(){localStorage.setItem(SK,JSON.stringify(products))}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function bcgen(){return '2000'+Math.floor(Math.random()*100000000).toString().padStart(8,'0')}
 function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function toast(m){els.toast.textContent=m;els.toast.classList.add('show');setTimeout(function(){els.toast.classList.remove('show')},2500)}
-function init(){load();render();updStats();els.offbadge.classList.remove('vis');if(!navigator.onLine)els.offbadge.classList.add('vis');window.addEventListener('online',function(){els.offbadge.classList.remove('vis')});window.addEventListener('offline',function(){els.offbadge.classList.add('vis')})}
-
-// Save
-els.btnSave.addEventListener('click',function(){
-var name=els.fName.value.trim();if(!name){toast('⚠️ نام جنس را وارد کنید');return}
-var price=parseInt(els.fPrice.value)||0;var cat=els.fCat.value.trim();var bc=els.fBC.value.trim()||bcgen();var stock=parseInt(els.fStock.value)||0;
-if(editingId){var idx=products.findIndex(function(p){return p.id===editingId});if(idx>=0)products[idx]={id:products[idx].id,name:name,price:price,category:cat,barcode:bc,stock:stock,updated:Date.now()};toast('✅ ویرایش شد');editingId=null;els.formTitle.textContent='➕ افزودن جنس جدید';els.btnCancel.style.display='none'}
-else{products.push({id:uid(),name:name,price:price,category:cat,barcode:bc,stock:stock,created:Date.now(),updated:Date.now()});toast('✅ جنس اضافه شد')}
-save();render();updStats();clearForm();
-});
-els.btnCancel.addEventListener('click',function(){editingId=null;clearForm();els.formTitle.textContent='➕ افزودن جنس جدید';els.btnCancel.style.display='none'});
-
+function updStats(){els.stTotal.textContent=products.length;var cats=new Set(products.map(function(p){return p.category}).filter(Boolean));els.stCat.textContent=cats.size}
 function clearForm(){['fName','fPrice','fCat','fBC','fStock'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=(id==='fStock')?'0':''})}
 function editProduct(id){var p=products.find(function(x){return x.id===id});if(!p)return;editingId=id;els.fName.value=p.name;els.fPrice.value=p.price||'';els.fCat.value=p.category||'';els.fBC.value=p.barcode||'';els.fStock.value=p.stock||0;els.formTitle.textContent='✏️ ویرایش جنس';els.btnCancel.style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
 function deleteProduct(id){if(!confirm('آیا از حذف مطمئن هستید؟'))return;products=products.filter(function(p){return p.id!==id});save();render();updStats();toast('🗑️ حذف شد')}
 
-// Render
+els.btnSave.addEventListener('click',function(){
+  var name=els.fName.value.trim();if(!name){toast('⚠️ نام جنس را وارد کنید');return}
+  var price=parseInt(els.fPrice.value)||0;var cat=els.fCat.value.trim();var bc=els.fBC.value.trim()||bcgen();var stock=parseInt(els.fStock.value)||0;
+  if(editingId){var idx=products.findIndex(function(p){return p.id===editingId});if(idx>=0)products[idx]={id:products[idx].id,name:name,price:price,category:cat,barcode:bc,stock:stock,updated:Date.now()};toast('✅ ویرایش شد');editingId=null;els.formTitle.textContent='➕ افزودن جنس جدید';els.btnCancel.style.display='none'}
+  else{products.push({id:uid(),name:name,price:price,category:cat,barcode:bc,stock:stock,created:Date.now(),updated:Date.now()});toast('✅ جنس اضافه شد')}
+  save();render();updStats();clearForm();
+});
+els.btnCancel.addEventListener('click',function(){editingId=null;clearForm();els.formTitle.textContent='➕ افزودن جنس جدید';els.btnCancel.style.display='none'});
+
 function render(){
-var q=(els.fSearch.value||'').toLowerCase();
-var filtered=products.filter(function(p){return!q||p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)||(p.barcode||'').includes(q)});
-if(!filtered.length){els.plist.innerHTML='<div class="empty"><div class="ico">📦</div><div>'+(q?'نتیجه‌ای یافت نشد':'هنوز جنسی اضافه نشده')+'</div></div>';return}
-els.plist.innerHTML=filtered.map(function(p){return '<div class="pitem"><div class="pinfo"><div class="pname">'+esc(p.name)+'</div><div class="pmeta">'+(p.price?'<span>💰 '+p.price.toLocaleString("fa")+' تومان</span>':'')+(p.category?'<span>📁 '+esc(p.category)+'</span>':'')+(p.stock?'<span>📦 '+p.stock+'</span>':'')+'</div></div><div class="pacts"><button class="ib barcode" data-action="barcode" data-id="'+p.id+'" title="بارکد">║</button><button class="ib qr" data-action="qr" data-id="'+p.id+'" title="QR">⊞</button><button class="ib edit" data-action="edit" data-id="'+p.id+'" title="ویرایش">✎</button><button class="ib del" data-action="del" data-id="'+p.id+'" title="حذف">✕</button></div></div>';}).join('')
+  var q=(els.fSearch.value||'').toLowerCase();
+  var filtered=products.filter(function(p){return!q||p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)||(p.barcode||'').includes(q)});
+  if(!filtered.length){els.plist.innerHTML='<div class="empty"><div class="ico">📦</div><div>'+(q?'نتیجه‌ای یافت نشد':'هنوز جنسی اضافه نشده')+'</div></div>';return}
+  els.plist.innerHTML=filtered.map(function(p){return '<div class="pitem"><div class="pinfo"><div class="pname">'+esc(p.name)+'</div><div class="pmeta">'+(p.price?'<span>💰 '+p.price.toLocaleString("fa")+' تومان</span>':'')+(p.category?'<span>📁 '+esc(p.category)+'</span>':'')+(p.stock?'<span>📦 '+p.stock+'</span>':'')+'</div></div><div class="pacts"><button class="ib barcode" data-action="barcode" data-id="'+p.id+'" title="بارکد">║</button><button class="ib qr" data-action="qr" data-id="'+p.id+'" title="QR">⊞</button><button class="ib edit" data-action="edit" data-id="'+p.id+'" title="ویرایش">✎</button><button class="ib del" data-action="del" data-id="'+p.id+'" title="حذف">✕</button></div></div>';}).join('')
 }
+els.plist.addEventListener('click',function(e){var btn=e.target.closest('[data-action]');if(!btn)return;var id=btn.getAttribute('data-id');var act=btn.getAttribute('data-action');if(act==='barcode')showBarcode(id);else if(act==='qr')showQR(id);else if(act==='edit')editProduct(id);else if(act==='del')deleteProduct(id)});
+els.fSearch.addEventListener('input',render);
 
-els.plist.addEventListener('click',function(e){var btn=e.target.closest('[data-action]');if(!btn)return;var id=btn.getAttribute('data-id');var action=btn.getAttribute('data-action');if(action==='barcode')showBarcode(id);else if(action==='qr')showQR(id);else if(action==='edit')editProduct(id);else if(action==='del')deleteProduct(id)});
-
-function updStats(){els.stTotal.textContent=products.length;var cats=new Set(products.map(function(p){return p.category}).filter(Boolean));els.stCat.textContent=cats.size}
-
-// Barcode
-function showBarcode(id){var p=products.find(function(x){return x.id===id});if(!p)return;currentBC=p;els.barcodeLabel.textContent=p.name+' | '+p.barcode;els.barcodeOutput.innerHTML='';var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='bcSvg';els.barcodeOutput.appendChild(svg);try{JsBarcode(svg,p.barcode||bcgen(),{format:'CODE128',width:2,height:80,displayValue:true,fontSize:14,margin:8,background:'#ffffff',lineColor:'#000000'})}catch(e){els.barcodeOutput.innerHTML='<div style="color:var(--danger);padding:16px">خطا: '+e.message+'</div>'}els.barcodeModal.classList.add('active')}
+function showBarcode(id){
+  var p=products.find(function(x){return x.id===id});if(!p)return;currentBC=p;
+  els.barcodeLabel.textContent=p.name+' | '+p.barcode;els.barcodeOutput.innerHTML='';
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='bcSvg';els.barcodeOutput.appendChild(svg);
+  try{JsBarcode(svg,p.barcode||bcgen(),{format:'CODE128',width:2,height:80,displayValue:true,fontSize:14,margin:8,background:'#ffffff',lineColor:'#000000'})}catch(e){els.barcodeOutput.innerHTML='<div style="color:var(--danger);padding:16px">❌ '+e.message+'</div>'}
+  els.barcodeModal.classList.add('active')
+}
 els.btnCloseBC.addEventListener('click',function(){els.barcodeModal.classList.remove('active')});
 els.barcodeModal.addEventListener('click',function(e){if(e.target===els.barcodeModal)els.barcodeModal.classList.remove('active')});
 
-// QR
-function showQR(id){var p=products.find(function(x){return x.id===id});if(!p)return;currentQR=p;els.qrLabel.textContent=p.name+' | '+(p.price?p.price.toLocaleString('fa')+' تومان':'');els.qrOutput.innerHTML='';var qrDiv=document.createElement('div');els.qrOutput.appendChild(qrDiv);try{new QRCode(qrDiv,{text:JSON.stringify({name:p.name,price:p.price,barcode:p.barcode,category:p.category}),width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}catch(e){els.qrOutput.innerHTML='<div style="color:var(--danger);padding:16px">خطا: '+e.message+'</div>'}els.qrModal.classList.add('active')}
+function showQR(id){
+  var p=products.find(function(x){return x.id===id});if(!p)return;currentQR=p;
+  els.qrLabel.textContent=p.name+' | '+(p.price?p.price.toLocaleString('fa')+' تومان':'');els.qrOutput.innerHTML='';
+  var qrDiv=document.createElement('div');els.qrOutput.appendChild(qrDiv);
+  try{new QRCode(qrDiv,{text:JSON.stringify({name:p.name,price:p.price,barcode:p.barcode,category:p.category}),width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}catch(e){els.qrOutput.innerHTML='<div style="color:var(--danger);padding:16px">❌ '+e.message+'</div>'}
+  els.qrModal.classList.add('active')
+}
 els.btnCloseQR.addEventListener('click',function(){els.qrModal.classList.remove('active')});
 els.qrModal.addEventListener('click',function(e){if(e.target===els.qrModal)els.qrModal.classList.remove('active')});
 
-// Download/Print
-els.btnDownloadBC.addEventListener('click',function(){var svg=document.getElementById('bcSvg');if(!svg)return;var sd=new XMLSerializer().serializeToString(svg);var c=document.createElement('canvas');var ctx=c.getContext('2d');var img=new Image();img.onload=function(){c.width=img.width*2;c.height=img.height*2;ctx.fillStyle='white';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);var a=document.createElement('a');a.download='barcode-'+(currentBC?currentBC.name:'unknown')+'.png';a.href=c.toDataURL('image/png');a.click();toast('📥 دانلود شد')};img.onerror=function(){toast('❌ خطا در دانلود')};img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(sd)))});
-els.btnPrintBC.addEventListener('click',function(){var svg=document.getElementById('bcSvg');if(!svg)return;var sd=new XMLSerializer().serializeToString(svg);var w=window.open('','_blank');w.document.write('<html><head><title>چاپ بارکد</title></head><body style="text-align:center;padding:20px;font-family:sans-serif"><h3>'+(currentBC?currentBC.name:'')+'</h3>'+sd+'<p>'+(currentBC?currentBC.barcode:'')+'</p><script>onload=function(){print();close()}<\/script></body></html>');w.document.close()});
-els.btnDownloadQR.addEventListener('click',function(){var img=els.qrOutput.querySelector('img');if(!img)return;var a=document.createElement('a');a.download='qr-'+(currentQR?currentQR.name:'unknown')+'.png';a.href=img.src;a.click();toast('📥 دانلود شد')});
+els.btnDownloadBC.addEventListener('click',function(){
+  var svg=document.getElementById('bcSvg');if(!svg){toast('❌ بارکد موجود نیست');return}
+  svgToPngDataUrl(svg,function(dataUrl){
+    if(!dataUrl){toast('❌ خطا در ساخت تصویر');return}
+    var a=document.createElement('a');a.download='barcode-'+(currentBC?currentBC.name:'unknown')+'.png';a.href=dataUrl;a.click();toast('📥 دانلود شد')
+  })
+});
+els.btnDownloadQR.addEventListener('click',function(){
+  var img=els.qrOutput.querySelector('img');if(!img){toast('❌ QR Code موجود نیست');return}
+  var a=document.createElement('a');a.download='qr-'+(currentQR?currentQR.name:'unknown')+'.png';a.href=img.src;a.click();toast('📥 دانلود شد')
+});
+els.btnPrintBC.addEventListener('click',function(){
+  var svg=document.getElementById('bcSvg');if(!svg)return;
+  var sd=new XMLSerializer().serializeToString(svg);
+  var w=window.open('','_blank');w.document.write('<html><head><title>چاپ بارکد</title></head><body style="text-align:center;padding:20px;font-family:sans-serif"><h3>'+(currentBC?currentBC.name:'')+'</h3>'+sd+'<p>'+(currentBC?currentBC.barcode:'')+'</p><script>onload=function(){print();close()}<\/script></body></html>');w.document.close()
+});
 
-// Search
-els.fSearch.addEventListener('input',render);
-
-// PWA Install
-var deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e});
-document.addEventListener('click',function(e){if(e.target.closest('.install-btn')&&deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(c){if(c.outcome==='accepted')toast('✅ اپ نصب شد');deferredPrompt=null})}});
-
-// Register SW
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(function(){console.log('SW ok')}).catch(function(e){console.log('SW err',e)})}
-
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(function(r){console.log('SW ok')}).catch(function(e){console.log('SW err',e)})}
 init();
 })();
 </script>
