@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sayn-barcode-v4';
+const CACHE_NAME = 'sayn-barcode-v5';
 const ASSETS = [
   './',
   './index.html',
