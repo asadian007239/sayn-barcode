@@ -1,112 +1,1231 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#1a1a2e">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="بارکد ساین">
-  <title>بارکد ساین</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#00d4ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="تولیدکننده بارکد و کد QR برای محصولات فروشگاهی">
+<title>تولیدکننده بارکد و QR</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0e27'/><rect x='6' y='8' width='3' height='10' fill='%2300d4ff'/><rect x='11' y='8' width='2' height='10' fill='%237c4dff'/><rect x='15' y='8' width='3' height='10' fill='%2300d4ff'/><rect x='20' y='8' width='2' height='10' fill='%237c4dff'/><rect x='24' y='8' width='2' height='10' fill='%2300d4ff'/><circle cx='16' cy='24' r='4' fill='none' stroke='%237c4dff' stroke-width='2'/></svg>">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#0a0e27;
+  --bg-secondary:#111638;
+  --bg-card:#1a1f45;
+  --bg-card-hover:#222860;
+  --bg-input:#0f1335;
+  --text-primary:#e8eaff;
+  --text-secondary:#9598c7;
+  --text-muted:#6568a0;
+  --accent-cyan:#00d4ff;
+  --accent-purple:#7c4dff;
+  --accent-gradient:linear-gradient(135deg,#00d4ff,#7c4dff);
+  --accent-gradient-hover:linear-gradient(135deg,#00bce6,#6a3de8);
+  --danger:#ff4757;
+  --danger-hover:#ff6b7a;
+  --success:#00e676;
+  --warning:#ffab00;
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --shadow-glow-cyan:0 0 20px rgba(0,212,255,0.3);
+  --shadow-glow-purple:0 0 20px rgba(124,77,255,0.3);
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+  --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',Tahoma,system-ui,-apple-system,sans-serif;
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  direction:rtl;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+body::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background:radial-gradient(ellipse at 20% 20%,rgba(0,212,255,0.05) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 80%,rgba(124,77,255,0.05) 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:var(--accent-gradient);border-radius:3px}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(124,77,255,0.15));
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,212,255,0.1);
+  padding:16px 20px;
+  position:sticky;top:0;z-index:100;
+}
+.header-content{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.header-title{
+  display:flex;align-items:center;gap:12px;
+}
+.header-title h1{
+  font-size:1.4rem;font-weight:700;
+  background:var(--accent-gradient);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.header-title .icon{
+  width:40px;height:40px;
+  background:var(--accent-gradient);
+  border-radius:var(--radius-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  box-shadow:var(--shadow-glow-cyan);
+}
+.header-stats{
+  display:flex;gap:16px;flex-wrap:wrap;
+}
+.stat-badge{
+  background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.2);
+  border-radius:var(--radius-sm);
+  padding:6px 14px;
+  font-size:0.85rem;
+  display:flex;align-items:center;gap:6px;
+}
+.stat-badge .num{
+  font-weight:700;
+  color:var(--accent-cyan);
+}
+
+/* Main container */
+.container{
+  max-width:1200px;margin:0 auto;
+  padding:20px;
+  position:relative;z-index:1;
+}
+
+/* Search bar */
+.search-bar{
+  display:flex;gap:12px;margin-bottom:24px;
+  flex-wrap:wrap;
+}
+.search-input-wrap{
+  flex:1;min-width:200px;position:relative;
+}
+.search-input-wrap svg{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;fill:var(--text-muted);
+}
+.search-input{
+  width:100%;padding:12px 44px 12px 16px;
+  background:var(--bg-input);
+  border:2px solid rgba(0,212,255,0.15);
+  border-radius:var(--radius-md);
+  color:var(--text-primary);
+  font-size:0.95rem;
+  transition:var(--transition);
+  outline:none;
+  font-family:inherit;
+}
+.search-input:focus{
+  border-color:var(--accent-cyan);
+  box-shadow:0 0 0 3px rgba(0,212,255,0.1);
+}
+.search-input::placeholder{color:var(--text-muted)}
+.filter-select{
+  padding:12px 16px;
+  background:var(--bg-input);
+  border:2px solid rgba(0,212,255,0.15);
+  border-radius:var(--radius-md);
+  color:var(--text-primary);
+  font-size:0.95rem;
+  transition:var(--transition);
+  outline:none;
+  cursor:pointer;
+  font-family:inherit;
+  min-width:160px;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%239598c7'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:left 14px center;
+}
+.filter-select:focus{
+  border-color:var(--accent-cyan);
+  box-shadow:0 0 0 3px rgba(0,212,255,0.1);
+}
+
+/* Action buttons */
+.btn{
+  padding:12px 24px;
+  border:none;border-radius:var(--radius-md);
+  font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:var(--transition);
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:inherit;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.btn-primary{
+  background:var(--accent-gradient);
+  color:#fff;
+  box-shadow:var(--shadow-sm),0 0 20px rgba(0,212,255,0.15);
+}
+.btn-primary:hover{
+  background:var(--accent-gradient-hover);
+  box-shadow:var(--shadow-md),0 0 30px rgba(0,212,255,0.25);
+  transform:translateY(-2px);
+}
+.btn-primary:active{transform:translateY(0)}
+.btn-danger{
+  background:var(--danger);
+  color:#fff;
+  box-shadow:var(--shadow-sm);
+}
+.btn-danger:hover{
+  background:var(--danger-hover);
+  transform:translateY(-2px);
+}
+.btn-sm{
+  padding:8px 14px;font-size:0.8rem;
+  border-radius:var(--radius-sm);
+}
+.btn-ghost{
+  background:rgba(0,212,255,0.1);
+  color:var(--accent-cyan);
+  border:1px solid rgba(0,212,255,0.2);
+}
+.btn-ghost:hover{
+  background:rgba(0,212,255,0.2);
+  transform:translateY(-1px);
+}
+.btn-icon{
+  width:36px;height:36px;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:var(--radius-sm);
+  font-size:1rem;
+}
+
+/* Product form */
+.form-section{
+  background:var(--bg-card);
+  border:1px solid rgba(0,212,255,0.1);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  margin-bottom:28px;
+  box-shadow:var(--shadow-md);
+  animation:slideUp 0.4s ease-out;
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.form-section h2{
+  font-size:1.15rem;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+  color:var(--text-primary);
+}
+.form-section h2 span{
+  background:var(--accent-gradient);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{
+  font-size:0.85rem;font-weight:500;
+  color:var(--text-secondary);
+}
+.form-group input,.form-group select{
+  padding:12px 14px;
+  background:var(--bg-input);
+  border:2px solid rgba(0,212,255,0.12);
+  border-radius:var(--radius-sm);
+  color:var(--text-primary);
+  font-size:0.95rem;
+  transition:var(--transition);
+  outline:none;
+  font-family:inherit;
+}
+.form-group input:focus,.form-group select:focus{
+  border-color:var(--accent-cyan);
+  box-shadow:0 0 0 3px rgba(0,212,255,0.08);
+}
+.form-group input::placeholder{color:var(--text-muted)}
+.form-actions{
+  display:flex;gap:12px;margin-top:20px;
+  flex-wrap:wrap;
+}
+
+/* Products grid */
+.products-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:8px;
+}
+.products-header h2{
+  font-size:1.1rem;display:flex;align-items:center;gap:8px;
+}
+.products-header .count{
+  background:rgba(0,212,255,0.15);
+  color:var(--accent-cyan);
+  padding:2px 10px;border-radius:20px;
+  font-size:0.8rem;font-weight:600;
+}
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:16px;
+  animation:fadeIn 0.3s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.product-card{
+  background:var(--bg-card);
+  border:1px solid rgba(0,212,255,0.08);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+.product-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:100%;height:3px;
+  background:var(--accent-gradient);
+  opacity:0;transition:var(--transition);
+}
+.product-card:hover{
+  border-color:rgba(0,212,255,0.2);
+  box-shadow:var(--shadow-md),0 0 30px rgba(0,212,255,0.05);
+  transform:translateY(-3px);
+}
+.product-card:hover::before{opacity:1}
+.product-card-header{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;margin-bottom:12px;
+}
+.product-name{font-size:1.05rem;font-weight:600;color:var(--text-primary)}
+.product-category{
+  background:rgba(124,77,255,0.15);
+  color:var(--accent-purple);
+  padding:3px 10px;border-radius:20px;
+  font-size:0.75rem;font-weight:600;
+  white-space:nowrap;
+}
+.product-details{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:16px;
+}
+.product-detail{
+  display:flex;flex-direction:column;
+}
+.product-detail .label{font-size:0.75rem;color:var(--text-muted)}
+.product-detail .value{font-size:0.95rem;font-weight:600;color:var(--text-primary)}
+.product-detail .value.price{color:var(--accent-cyan)}
+.product-detail .value.stock-low{color:var(--danger)}
+.product-detail .value.stock-ok{color:var(--success)}
+.product-barcode-preview{
+  background:var(--bg-input);
+  border-radius:var(--radius-sm);
+  padding:10px;margin-bottom:14px;
+  text-align:center;
+  overflow:hidden;
+}
+.product-barcode-preview svg,
+.product-barcode-preview canvas{
+  max-width:100%;height:auto;
+}
+.product-actions{
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.product-actions .btn{flex:1;justify-content:center}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:60px 20px;
+  color:var(--text-muted);
+}
+.empty-state .icon{
+  font-size:4rem;margin-bottom:16px;
+  opacity:0.5;
+}
+.empty-state h3{font-size:1.2rem;color:var(--text-secondary);margin-bottom:8px}
+.empty-state p{font-size:0.9rem}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(5,7,20,0.85);
+  backdrop-filter:blur(8px);
+  z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;visibility:hidden;
+  transition:opacity 0.3s ease,visibility 0.3s ease;
+}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal{
+  background:var(--bg-card);
+  border:1px solid rgba(0,212,255,0.15);
+  border-radius:var(--radius-xl);
+  padding:32px;
+  max-width:500px;width:100%;
+  box-shadow:var(--shadow-lg),var(--shadow-glow-cyan);
+  transform:scale(0.9) translateY(20px);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  text-align:center;
+  max-height:90vh;
+  overflow-y:auto;
+}
+.modal-overlay.active .modal{transform:scale(1) translateY(0)}
+.modal h3{
+  font-size:1.2rem;margin-bottom:8px;
+  background:var(--accent-gradient);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.modal .product-name-modal{
+  color:var(--text-secondary);
+  margin-bottom:20px;font-size:0.95rem;
+}
+.modal .barcode-display{
+  background:#fff;
+  border-radius:var(--radius-md);
+  padding:20px;
+  margin-bottom:20px;
+}
+.modal .barcode-display canvas,
+.modal .barcode-display svg{
+  max-width:100%;height:auto;
+}
+.modal .qr-display{
+  background:#fff;
+  border-radius:var(--radius-md);
+  padding:20px;
+  margin-bottom:20px;
+  display:inline-block;
+}
+.modal .qr-display canvas,
+.modal .qr-display img{
+  max-width:100%;height:auto;
+}
+.modal-actions{
+  display:flex;gap:10px;justify-content:center;
+  flex-wrap:wrap;margin-top:16px;
+}
+
+/* Toast */
+.toast-container{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  z-index:2000;
+  display:flex;flex-direction:column;
+  gap:8px;align-items:center;
+  pointer-events:none;
+}
+.toast{
+  padding:12px 24px;
+  border-radius:var(--radius-md);
+  font-size:0.9rem;font-weight:500;
+  color:#fff;
+  box-shadow:var(--shadow-lg);
+  animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1),toastOut 0.3s ease 2.7s forwards;
+  pointer-events:auto;
+  display:flex;align-items:center;gap:8px;
+  max-width:90vw;
+}
+.toast-success{background:linear-gradient(135deg,#00c853,#00e676)}
+.toast-error{background:linear-gradient(135deg,#d50000,#ff1744)}
+.toast-info{background:linear-gradient(135deg,#0091ea,#00d4ff)}
+@keyframes toastIn{
+  from{opacity:0;transform:translateY(30px) scale(0.9)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes toastOut{
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(-20px)}
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .header-content{flex-direction:column;text-align:center}
+  .header-stats{justify-content:center}
+  .products-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .modal{padding:24px;margin:10px}
+  .container{padding:12px}
+  .header{padding:12px 14px}
+  .product-actions{flex-direction:column}
+  .product-actions .btn{width:100%}
+}
+@media(max-width:480px){
+  .header-title h1{font-size:1.1rem}
+  .search-bar{flex-direction:column}
+  .filter-select{width:100%}
+}
+
+/* Confirm dialog */
+.confirm-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(5,7,20,0.9);
+  z-index:1500;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;visibility:hidden;
+  transition:opacity 0.3s ease,visibility 0.3s ease;
+}
+.confirm-overlay.active{opacity:1;visibility:visible}
+.confirm-dialog{
+  background:var(--bg-card);
+  border:1px solid rgba(255,71,87,0.3);
+  border-radius:var(--radius-lg);
+  padding:28px;
+  max-width:400px;width:100%;
+  text-align:center;
+  box-shadow:var(--shadow-lg);
+  transform:scale(0.9);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.confirm-overlay.active .confirm-dialog{transform:scale(1)}
+.confirm-dialog h3{color:var(--danger);margin-bottom:12px;font-size:1.1rem}
+.confirm-dialog p{color:var(--text-secondary);margin-bottom:20px;font-size:0.95rem}
+.confirm-actions{display:flex;gap:10px;justify-content:center}
+</style>
 </head>
 <body>
-  <!-- Offline Badge -->
-  <div class="offline-badge" id="offlineBadge">📡 آفلاین</div>
 
-  <!-- Header -->
-  <div class="header">
-    <h1>📊 بارکد ساین</h1>
-    <div class="subtitle">تولید بارکد و QR Code برای اجناس</div>
-  </div>
-
-  <div class="container">
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="num" id="totalCount">0</div>
-        <div class="label">تعداد اجناس</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="categoryCount">0</div>
-        <div class="label">دسته‌بندی</div>
-      </div>
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="header-title">
+      <div class="icon">📊</div>
+      <h1>تولیدکننده بارکد و QR</h1>
     </div>
-
-    <!-- Add Product Form -->
-    <div class="form-card" id="addForm">
-      <h2 id="formTitle">➕ افزودن جنس جدید</h2>
-      <div class="input-group">
-        <label>نام جنس</label>
-        <input type="text" id="pName" placeholder="مثال: آیفون ۱۵">
-      </div>
-      <div class="input-row">
-        <div class="input-group">
-          <label>قیمت (تومان)</label>
-          <input type="number" id="pPrice" placeholder="0">
-        </div>
-        <div class="input-group">
-          <label>دسته‌بندی</label>
-          <input type="text" id="pCategory" placeholder="مثال: موبایل">
-        </div>
-      </div>
-      <div class="input-row">
-        <div class="input-group">
-          <label>بارکد (خالی = خودکار)</label>
-          <input type="text" id="pBarcode" placeholder="خودکار">
-        </div>
-        <div class="input-group">
-          <label>موجودی</label>
-          <input type="number" id="pStock" placeholder="0" value="0">
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="saveProduct()">💾 ذخیره</button>
-      <button class="btn btn-secondary" id="cancelBtn" style="display:none;margin-top:8px" onclick="cancelEdit()">❌ انصراف</button>
-    </div>
-
-    <!-- Search -->
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="🔍 جستجوی جنس..." oninput="renderProducts()">
-    </div>
-
-    <!-- Product List -->
-    <div class="product-list" id="productList"></div>
-  </div>
-
-  <!-- Barcode Modal -->
-  <div class="modal-overlay" id="barcodeModal">
-    <div class="modal">
-      <h3 id="modalTitle">بارکد</h3>
-      <div id="barcodeOutput"></div>
-      <div class="barcode-label" id="barcodeLabel"></div>
-      <div class="modal-actions">
-        <button class="btn btn-primary btn-sm" onclick="downloadBarcode()">📥 دانلود</button>
-        <button class="btn btn-secondary btn-sm" onclick="printBarcode()">🖨️ چاپ</button>
-        <button class="btn btn-sm" style="background:#555;color:#fff" onclick="closeModal()">✖️ بستن</button>
-      </div>
+    <div class="header-stats" id="headerStats">
+      <div class="stat-badge">📦 کل محصولات: <span class="num" id="statTotal">0</span></div>
+      <div class="stat-badge">📁 دسته‌بندی‌ها: <span class="num" id="statCategories">0</span></div>
     </div>
   </div>
+</header>
 
-  <!-- QR Modal -->
-  <div class="modal-overlay" id="qrModal">
-    <div class="modal">
-      <h3 id="qrModalTitle">QR Code</h3>
-      <div id="qrOutput"></div>
-      <div class="barcode-label" id="qrLabel"></div>
-      <div class="modal-actions">
-        <button class="btn btn-primary btn-sm" onclick="downloadQR()">📥 دانلود</button>
-        <button class="btn btn-sm" style="background:#555;color:#fff" onclick="closeQRModal()">✖️ بستن</button>
+<!-- Main Container -->
+<div class="container">
+
+  <!-- Product Form -->
+  <section class="form-section" id="formSection">
+    <h2><span id="formTitle">➕ افزودن محصول جدید</span></h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="productName">نام محصول</label>
+        <input type="text" id="productName" placeholder="مثلاً: آبمیوه طبیعی">
+      </div>
+      <div class="form-group">
+        <label for="productPrice">قیمت (تومان)</label>
+        <input type="number" id="productPrice" placeholder="مثلاً: 45000" min="0">
+      </div>
+      <div class="form-group">
+        <label for="productCategory">دسته‌بندی</label>
+        <input type="text" id="productCategory" placeholder="مثلاً: نوشیدنی" list="categoryList">
+        <datalist id="categoryList"></datalist>
+      </div>
+      <div class="form-group">
+        <label for="productBarcode">بارکد (اختیاری - خودکار تولید می‌شود)</label>
+        <input type="text" id="productBarcode" placeholder="خالی بگذارید برای تولید خودکار">
+      </div>
+      <div class="form-group">
+        <label for="productStock">موجودی</label>
+        <input type="number" id="productStock" placeholder="مثلاً: 100" min="0">
       </div>
     </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="btnSaveProduct">
+        <span>💾</span> ذخیره محصول
+      </button>
+      <button class="btn btn-ghost" id="btnCancelEdit" style="display:none">
+        <span>✕</span> انصراف
+      </button>
+      <button class="btn btn-ghost" id="btnGenerateBarcode">
+        <span>🎲</span> تولید بارکد تصادفی
+      </button>
+    </div>
+  </section>
+
+  <!-- Search & Filter -->
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="جستجو در محصولات...">
+    </div>
+    <select class="filter-select" id="categoryFilter">
+      <option value="">همه دسته‌بندی‌ها</option>
+    </select>
   </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+  <!-- Products Grid -->
+  <div class="products-header">
+    <h2>📦 لیست محصولات <span class="count" id="productCount">0</span></h2>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</div>
 
-  <!-- Scripts with correct relative paths -->
-  <script src="lib/JsBarcode.all.min.js"></script>
-  <script src="lib/qrcode.min.js"></script>
-  <script src="app.js"></script>
+<!-- Barcode Modal -->
+<div class="modal-overlay" id="barcodeModal">
+  <div class="modal">
+    <h3>📊 بارکد محصول</h3>
+    <p class="product-name-modal" id="barcodeModalName"></p>
+    <div class="barcode-display" id="barcodeDisplay"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-sm" id="btnDownloadBarcode">📥 دانلود PNG</button>
+      <button class="btn btn-ghost btn-sm" id="btnPrintBarcode">🖨️ چاپ</button>
+      <button class="btn btn-ghost btn-sm" id="btnCloseBarcode">بستن</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal">
+    <h3>📱 کد QR محصول</h3>
+    <p class="product-name-modal" id="qrModalName"></p>
+    <div class="qr-display" id="qrDisplay"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-sm" id="btnDownloadQR">📥 دانلود PNG</button>
+      <button class="btn btn-ghost btn-sm" id="btnCloseQR">بستن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-dialog">
+    <h3>⚠️ حذف محصول</h3>
+    <p id="confirmMessage">آیا از حذف این محصول اطمینان دارید؟</p>
+    <div class="confirm-actions">
+      <button class="btn btn-danger btn-sm" id="btnConfirmYes">بله، حذف شود</button>
+      <button class="btn btn-ghost btn-sm" id="btnConfirmNo">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==================== STATE ====================
+  let products = [];
+  let editingId = null;
+  let deleteTargetId = null;
+  let currentBarcodeData = null;
+  let currentQRData = null;
+
+  // ==================== DOM REFS ====================
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  const els = {
+    productName: $('#productName'),
+    productPrice: $('#productPrice'),
+    productCategory: $('#productCategory'),
+    productBarcode: $('#productBarcode'),
+    productStock: $('#productStock'),
+    searchInput: $('#searchInput'),
+    categoryFilter: $('#categoryFilter'),
+    categoryList: $('#categoryList'),
+    productsGrid: $('#productsGrid'),
+    formSection: $('#formSection'),
+    formTitle: $('#formTitle'),
+    btnSaveProduct: $('#btnSaveProduct'),
+    btnCancelEdit: $('#btnCancelEdit'),
+    btnGenerateBarcode: $('#btnGenerateBarcode'),
+    statTotal: $('#statTotal'),
+    statCategories: $('#statCategories'),
+    productCount: $('#productCount'),
+    barcodeModal: $('#barcodeModal'),
+    barcodeDisplay: $('#barcodeDisplay'),
+    barcodeModalName: $('#barcodeModalName'),
+    qrModal: $('#qrModal'),
+    qrDisplay: $('#qrDisplay'),
+    qrModalName: $('#qrModalName'),
+    confirmOverlay: $('#confirmOverlay'),
+    confirmMessage: $('#confirmMessage'),
+    toastContainer: $('#toastContainer'),
+    btnDownloadBarcode: $('#btnDownloadBarcode'),
+    btnPrintBarcode: $('#btnPrintBarcode'),
+    btnCloseBarcode: $('#btnCloseBarcode'),
+    btnDownloadQR: $('#btnDownloadQR'),
+    btnCloseQR: $('#btnCloseQR'),
+    btnConfirmYes: $('#btnConfirmYes'),
+    btnConfirmNo: $('#btnConfirmNo'),
+  };
+
+  // ==================== UTILITIES ====================
+  function generateBarcode() {
+    const chars = '0123456789';
+    let code = '';
+    for (let i = 0; i < 13; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  function formatPrice(num) {
+    if (!num && num !== 0) return '—';
+    return Number(num).toLocaleString('fa-IR') + ' تومان';
+  }
+
+  function formatNumber(num) {
+    if (!num && num !== 0) return '0';
+    return Number(num).toLocaleString('fa-IR');
+  }
+
+  // ==================== LOCAL STORAGE ====================
+  function saveProducts() {
+    try {
+      localStorage.setItem('barcode_products', JSON.stringify(products));
+    } catch (e) {
+      console.error('Error saving products:', e);
+    }
+  }
+
+  function loadProducts() {
+    try {
+      const data = localStorage.getItem('barcode_products');
+      products = data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Error loading products:', e);
+      products = [];
+    }
+  }
+
+  // ==================== TOAST ====================
+  function showToast(message, type) {
+    type = type || 'info';
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    toast.innerHTML = '<span>' + (icons[type] || '') + '</span> ' + message;
+    els.toastContainer.appendChild(toast);
+    setTimeout(function() {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 3200);
+  }
+
+  // ==================== RENDER ====================
+  function getCategories() {
+    const cats = {};
+    products.forEach(function(p) {
+      if (p.category && p.category.trim()) {
+        const c = p.category.trim();
+        cats[c] = (cats[c] || 0) + 1;
+      }
+    });
+    return cats;
+  }
+
+  function updateStats() {
+    els.statTotal.textContent = formatNumber(products.length);
+    els.statCategories.textContent = formatNumber(Object.keys(getCategories()).length);
+    els.productCount.textContent = formatNumber(getFilteredProducts().length);
+  }
+
+  function updateCategoryList() {
+    const cats = Object.keys(getCategories()).sort();
+    // datalist
+    els.categoryList.innerHTML = '';
+    cats.forEach(function(c) {
+      const opt = document.createElement('option');
+      opt.value = c;
+      els.categoryList.appendChild(opt);
+    });
+    // filter dropdown
+    const current = els.categoryFilter.value;
+    els.categoryFilter.innerHTML = '<option value="">همه دسته‌بندی‌ها</option>';
+    cats.forEach(function(c) {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c + ' (' + getCategories()[c] + ')';
+      els.categoryFilter.appendChild(opt);
+    });
+    els.categoryFilter.value = current;
+  }
+
+  function getFilteredProducts() {
+    const search = (els.searchInput.value || '').toLowerCase().trim();
+    const cat = els.categoryFilter.value;
+    return products.filter(function(p) {
+      const matchSearch = !search ||
+        (p.name && p.name.toLowerCase().indexOf(search) !== -1) ||
+        (p.barcode && p.barcode.indexOf(search) !== -1) ||
+        (p.category && p.category.toLowerCase().indexOf(search) !== -1);
+      const matchCat = !cat || p.category === cat;
+      return matchSearch && matchCat;
+    });
+  }
+
+  function renderProducts() {
+    const filtered = getFilteredProducts();
+    updateStats();
+
+    if (filtered.length === 0) {
+      els.productsGrid.innerHTML =
+        '<div class="empty-state">' +
+        '<div class="icon">📦</div>' +
+        '<h3>محصولی یافت نشد</h3>' +
+        '<p>اگر محصولی اضافه کرده‌اید، فیلترها را بررسی کنید</p>' +
+        '</div>';
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(function(p) {
+      const stockClass = p.stock <= 10 ? 'stock-low' : 'stock-ok';
+      html +=
+        '<div class="product-card" data-id="' + p.id + '">' +
+          '<div class="product-card-header">' +
+            '<span class="product-name">' + escapeHtml(p.name) + '</span>' +
+            (p.category ? '<span class="product-category">' + escapeHtml(p.category) + '</span>' : '') +
+          '</div>' +
+          '<div class="product-details">' +
+            '<div class="product-detail">' +
+              '<span class="label">قیمت</span>' +
+              '<span class="value price">' + formatPrice(p.price) + '</span>' +
+            '</div>' +
+            '<div class="product-detail">' +
+              '<span class="label">موجودی</span>' +
+              '<span class="value ' + stockClass + '">' + formatNumber(p.stock) + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="product-barcode-preview" id="barcodePreview_' + p.id + '">' +
+          '</div>' +
+          '<div class="product-actions">' +
+            '<button class="btn btn-ghost btn-sm btn-icon action-barcode" data-id="' + p.id + '" title="بارکد">📊</button>' +
+            '<button class="btn btn-ghost btn-sm btn-icon action-qr" data-id="' + p.id + '" title="کد QR">📱</button>' +
+            '<button class="btn btn-ghost btn-sm btn-icon action-edit" data-id="' + p.id + '" title="ویرایش">✏️</button>' +
+            '<button class="btn btn-danger btn-sm btn-icon action-delete" data-id="' + p.id + '" title="حذف">🗑️</button>' +
+          '</div>' +
+        '</div>';
+    });
+
+    els.productsGrid.innerHTML = html;
+
+    // Render barcode previews
+    filtered.forEach(function(p) {
+      var previewEl = document.getElementById('barcodePreview_' + p.id);
+      if (previewEl) {
+        try {
+          var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('id', 'barcodeSvg_' + p.id);
+          previewEl.appendChild(svg);
+          JsBarcode('#barcodeSvg_' + p.id, p.barcode, {
+            format: 'CODE128',
+            width: 1.5,
+            height: 40,
+            displayValue: true,
+            fontSize: 12,
+            margin: 4,
+            background: 'transparent',
+            lineColor: '#e8eaff',
+            textMargin: 2
+          });
+        } catch (e) {
+          previewEl.innerHTML = '<span style="color:#ff4757;font-size:0.85rem">خطا در تولید بارکد</span>';
+        }
+      }
+    });
+
+    // Attach card action listeners
+    attachCardActions();
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // ==================== CARD ACTIONS ====================
+  function attachCardActions() {
+    var cards = els.productsGrid.querySelectorAll('.product-card');
+    cards.forEach(function(card) {
+      var id = card.getAttribute('data-id');
+      var barcodeBtn = card.querySelector('.action-barcode');
+      var qrBtn = card.querySelector('.action-qr');
+      var editBtn = card.querySelector('.action-edit');
+      var deleteBtn = card.querySelector('.action-delete');
+
+      if (barcodeBtn) {
+        barcodeBtn.addEventListener('click', function() { showBarcodeModal(id); });
+      }
+      if (qrBtn) {
+        qrBtn.addEventListener('click', function() { showQRModal(id); });
+      }
+      if (editBtn) {
+        editBtn.addEventListener('click', function() { startEdit(id); });
+      }
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() { confirmDelete(id); });
+      }
+    });
+  }
+
+  // ==================== CRUD ====================
+  function addProduct(data) {
+    var product = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      name: data.name,
+      price: data.price,
+      category: data.category,
+      barcode: data.barcode,
+      stock: data.stock,
+      createdAt: new Date().toISOString()
+    };
+    products.unshift(product);
+    saveProducts();
+    renderProducts();
+    updateCategoryList();
+    showToast('محصول «' + product.name +» اضافه شد', 'success');
+  }
+
+  function updateProduct(id, data) {
+    var idx = products.findIndex(function(p) { return p.id === id; });
+    if (idx === -1) return;
+    products[idx].name = data.name;
+    products[idx].price = data.price;
+    products[idx].category = data.category;
+    products[idx].barcode = data.barcode;
+    products[idx].stock = data.stock;
+    products[idx].updatedAt = new Date().toISOString();
+    saveProducts();
+    renderProducts();
+    updateCategoryList();
+    showToast('محصول «' + data.name + '» بروزرسانی شد', 'success');
+  }
+
+  function deleteProduct(id) {
+    var p = products.find(function(p) { return p.id === id; });
+    products = products.filter(function(p) { return p.id !== id; });
+    saveProducts();
+    renderProducts();
+    updateCategoryList();
+    if (p) showToast('محصول «' + p.name + '» حذف شد', 'info');
+  }
+
+  function startEdit(id) {
+    var p = products.find(function(p) { return p.id === id; });
+    if (!p) return;
+    editingId = id;
+    els.formTitle.innerHTML = '<span>✏️ ویرایش محصول</span>';
+    els.productName.value = p.name || '';
+    els.productPrice.value = p.price || '';
+    els.productCategory.value = p.category || '';
+    els.productBarcode.value = p.barcode || '';
+    els.productStock.value = p.stock || '';
+    els.btnCancelEdit.style.display = 'inline-flex';
+    els.formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetForm() {
+    editingId = null;
+    els.formTitle.innerHTML = '<span>➕ افزودن محصول جدید</span>';
+    els.productName.value = '';
+    els.productPrice.value = '';
+    els.productCategory.value = '';
+    els.productBarcode.value = '';
+    els.productStock.value = '';
+    els.btnCancelEdit.style.display = 'none';
+  }
+
+  function handleSave() {
+    var name = (els.productName.value || '').trim();
+    var price = els.productPrice.value ? parseInt(els.productPrice.value, 10) : 0;
+    var category = (els.productCategory.value || '').trim();
+    var barcode = (els.productBarcode.value || '').trim();
+    var stock = els.productStock.value ? parseInt(els.productStock.value, 10) : 0;
+
+    if (!name) {
+      showToast('لطفاً نام محصول را وارد کنید', 'error');
+      els.productName.focus();
+      return;
+    }
+
+    // Check barcode uniqueness
+    if (barcode) {
+      var exists = products.find(function(p) {
+        return p.barcode === barcode && p.id !== editingId;
+      });
+      if (exists) {
+        showToast('این بارکد قبلاً استفاده شده است', 'error');
+        els.productBarcode.focus();
+        return;
+      }
+    } else {
+      barcode = generateBarcode();
+      // Ensure uniqueness
+      while (products.find(function(p) { return p.barcode === barcode; })) {
+        barcode = generateBarcode();
+      }
+    }
+
+    var data = { name: name, price: price, category: category, barcode: barcode, stock: stock };
+
+    if (editingId) {
+      updateProduct(editingId, data);
+    } else {
+      addProduct(data);
+    }
+    resetForm();
+  }
+
+  // ==================== MODALS ====================
+  function showBarcodeModal(id) {
+    var p = products.find(function(p) { return p.id === id; });
+    if (!p) return;
+    currentBarcodeData = p;
+    els.barcodeModalName.textContent = p.name;
+    els.barcodeDisplay.innerHTML = '';
+    try {
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('id', 'modalBarcodeSvg');
+      els.barcodeDisplay.appendChild(svg);
+      JsBarcode('#modalBarcodeSvg', p.barcode, {
+        format: 'CODE128',
+        width: 2.5,
+        height: 80,
+        displayValue: true,
+        fontSize: 16,
+        margin: 10,
+        background: '#ffffff',
+        lineColor: '#000000',
+        textMargin: 6
+      });
+    } catch (e) {
+      els.barcodeDisplay.innerHTML = '<p style="color:#ff4757">خطا در تولید بارکد</p>';
+    }
+    els.barcodeModal.classList.add('active');
+  }
+
+  function showQRModal(id) {
+    var p = products.find(function(p) { return p.id === id; });
+    if (!p) return;
+    currentQRData = p;
+    els.qrModalName.textContent = p.name;
+    els.qrDisplay.innerHTML = '';
+    try {
+      var qrDiv = document.createElement('div');
+      qrDiv.setAttribute('id', 'qrCanvas');
+      els.qrDisplay.appendChild(qrDiv);
+      new QRCode(qrDiv, {
+        text: p.barcode,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch (e) {
+      els.qrDisplay.innerHTML = '<p style="color:#ff4757">خطا در تولید کد QR</p>';
+    }
+    els.qrModal.classList.add('active');
+  }
+
+  function closeBarcodeModal() {
+    els.barcodeModal.classList.remove('active');
+    currentBarcodeData = null;
+  }
+
+  function closeQRModal() {
+    els.qrModal.classList.remove('active');
+    currentQRData = null;
+  }
+
+  // ==================== DOWNLOAD ====================
+  function downloadBarcodePNG() {
+    if (!currentBarcodeData) return;
+    var svg = document.querySelector('#barcodeDisplay svg');
+    if (!svg) return;
+    var svgData = new XMLSerializer().serializeToString(svg);
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    img.onload = function() {
+      canvas.width = img.width * 2;
+      canvas.height = img.height * 2;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      var link = document.createElement('a');
+      link.download = 'barcode_' + currentBarcodeData.barcode + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('بارکد دانلود شد', 'success');
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  }
+
+  function downloadQRPNG() {
+    if (!currentQRData) return;
+    var qrCanvas = document.querySelector('#qrDisplay canvas');
+    var qrImg = document.querySelector('#qrDisplay img');
+    if (qrCanvas) {
+      var link = document.createElement('a');
+      link.download = 'qr_' + currentQRData.barcode + '.png';
+      link.href = qrCanvas.toDataURL('image/png');
+      link.click();
+      showToast('کد QR دانلود شد', 'success');
+    } else if (qrImg) {
+      var link2 = document.createElement('a');
+      link2.download = 'qr_' + currentQRData.barcode + '.png';
+      link2.href = qrImg.src;
+      link2.click();
+      showToast('کد QR دانلود شد', 'success');
+    }
+  }
+
+  function printBarcode() {
+    if (!currentBarcodeData) return;
+    var svg = document.querySelector('#barcodeDisplay svg');
+    if (!svg) return;
+    var printWindow = window.open('', '_blank');
+    printWindow.document.write(
+      '<!DOCTYPE html><html><head><title>چاپ بارکد</title>' +
+      '<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif}' +
+      'img{max-width:100%}</style></head><body></body></html>'
+    );
+    var svgData = new XMLSerializer().serializeToString(svg);
+    var img = new Image();
+    img.onload = function() {
+      printWindow.document.body.innerHTML = '';
+      printWindow.document.body.appendChild(img);
+      setTimeout(function() {
+        printWindow.print();
+      }, 500);
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    img.style.maxWidth = '100%';
+  }
+
+  // ==================== CONFIRM DELETE ====================
+  function confirmDelete(id) {
+    var p = products.find(function(p) { return p.id === id; });
+    if (!p) return;
+    deleteTargetId = id;
+    els.confirmMessage.textContent = 'آیا از حذف محصول «' + p.name + '» اطمینان دارید؟';
+    els.confirmOverlay.classList.add('active');
+  }
+
+  function handleConfirmYes() {
+    if (deleteTargetId) {
+      deleteProduct(deleteTargetId);
+      deleteTargetId = null;
+    }
+    els.confirmOverlay.classList.remove('active');
+  }
+
+  function handleConfirmNo() {
+    deleteTargetId = null;
+    els.confirmOverlay.classList.remove('active');
+  }
+
+  // ==================== EVENT LISTENERS ====================
+  // All listeners are attached after DOM is ready (this IIFE runs at end of body)
+
+  els.btnSaveProduct.addEventListener('click', handleSave);
+  els.btnCancelEdit.addEventListener('click', resetForm);
+  els.btnGenerateBarcode.addEventListener('click', function() {
+    var code = generateBarcode();
+    els.productBarcode.value = code;
+    showToast('بارکد تصادفی تولید شد', 'info');
+  });
+
+  // Search & filter
+  els.searchInput.addEventListener('input', renderProducts);
+  els.categoryFilter.addEventListener('change', renderProducts);
+
+  // Barcode modal
+  els.btnCloseBarcode.addEventListener('click', closeBarcodeModal);
+  els.btnDownloadBarcode.addEventListener('click', downloadBarcodePNG);
+  els.btnPrintBarcode.addEventListener('click', printBarcode);
+  els.barcodeModal.addEventListener('click', function(e) {
+    if (e.target === els.barcodeModal) closeBarcodeModal();
+  });
+
+  // QR modal
+  els.btnCloseQR.addEventListener('click', closeQRModal);
+  els.btnDownloadQR.addEventListener('click', downloadQRPNG);
+  els.qrModal.addEventListener('click', function(e) {
+    if (e.target === els.qrModal) closeQRModal();
+  });
+
+  // Confirm dialog
+  els.btnConfirmYes.addEventListener('click', handleConfirmYes);
+  els.btnConfirmNo.addEventListener('click', handleConfirmNo);
+  els.confirmOverlay.addEventListener('click', function(e) {
+    if (e.target === els.confirmOverlay) handleConfirmNo();
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeBarcodeModal();
+      closeQRModal();
+      handleConfirmNo();
+    }
+    // Ctrl+N or Ctrl+Enter to save
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    }
+  });
+
+  // Enter key in form fields to save
+  els.productStock.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    }
+  });
+
+  // ==================== SERVICE WORKER ====================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').then(function(reg) {
+        console.log('Service Worker registered:', reg.scope);
+      }).catch(function(err) {
+        console.warn('Service Worker registration failed:', err);
+      });
+    });
+  }
+
+  // ==================== INIT ====================
+  loadProducts();
+  renderProducts();
+  updateCategoryList();
+
+})();
+</script>
 </body>
 </html>
