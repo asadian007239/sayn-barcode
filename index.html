@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#e94560">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>بارکد ساین</title>
+  <link rel="manifest" href="/barcode/assets/manifest.json">
+  <link rel="stylesheet" href="/barcode/assets/style.css">
+</head>
+<body>
+  <!-- Offline Badge -->
+  <div class="offline-badge" id="offlineBadge">📡 آفلاین</div>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>📊 بارکد ساین</h1>
+    <div class="subtitle">تولید بارکد و QR Code برای اجناس</div>
+  </div>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="num" id="totalCount">0</div>
+        <div class="label">تعداد اجناس</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="categoryCount">0</div>
+        <div class="label">دسته‌بندی</div>
+      </div>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="form-card" id="addForm">
+      <h2 id="formTitle">➕ افزودن جنس جدید</h2>
+      <div class="input-group">
+        <label>نام جنس</label>
+        <input type="text" id="pName" placeholder="مثال: آیفون ۱۵">
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>قیمت (تومان)</label>
+          <input type="number" id="pPrice" placeholder="0">
+        </div>
+        <div class="input-group">
+          <label>دسته‌بندی</label>
+          <input type="text" id="pCategory" placeholder="مثال: موبایل">
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>بارکد (خالی = خودکار)</label>
+          <input type="text" id="pBarcode" placeholder="خودکار">
+        </div>
+        <div class="input-group">
+          <label>موجودی</label>
+          <input type="number" id="pStock" placeholder="0" value="0">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 ذخیره</button>
+      <button class="btn btn-secondary" id="cancelBtn" style="display:none;margin-top:8px" onclick="cancelEdit()">❌ انصراف</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="جستجوی جنس..." oninput="renderProducts()">
+    </div>
+
+    <!-- Product List -->
+    <div class="product-list" id="productList"></div>
+  </div>
+
+  <!-- Barcode Modal -->
+  <div class="modal-overlay" id="barcodeModal">
+    <div class="modal">
+      <h3 id="modalTitle">بارکد</h3>
+      <div id="barcodeOutput"></div>
+      <div class="barcode-label" id="barcodeLabel"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-sm" onclick="downloadBarcode()">📥 دانلود</button>
+        <button class="btn btn-secondary btn-sm" onclick="printBarcode()">🖨️ چاپ</button>
+        <button class="btn btn-sm" style="background:#555;color:#fff" onclick="closeModal()">✖️ بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal">
+      <h3 id="qrModalTitle">QR Code</h3>
+      <div id="qrOutput"></div>
+      <div class="barcode-label" id="qrLabel"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-sm" onclick="downloadQR()">📥 دانلود</button>
+        <button class="btn btn-sm" style="background:#555;color:#fff" onclick="closeQRModal()">✖️ بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/barcode/lib/JsBarcode.all.min.js"></script>
+  <script src="/barcode/lib/qrcode.min.js"></script>
+  <script src="/barcode/assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "ساین - تولید بارکد",
+  "short_name": "بارکد ساین",
+  "description": "تولید بارکد و QR Code برای اجناس فروشگاه",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a2e",
+  "theme_color": "#e94560",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23e94560'/><text x='50' y='65' text-anchor='middle' font-size='50' fill='white'>║</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
