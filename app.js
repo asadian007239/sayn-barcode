@@ -1,33 +1,44 @@
 // === Sayn Barcode Generator PWA ===
-// کاملاً آفلاین - ذخیره در localStorage
-
 const STORAGE_KEY = 'sayn_products';
 let products = [];
 let editingId = null;
 let currentProduct = null;
 
 // === Init ===
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   loadProducts();
   renderProducts();
   updateStats();
   registerSW();
-  window.addEventListener('online', () => document.getElementById('offlineBadge').classList.remove('visible'));
-  window.addEventListener('offline', () => document.getElementById('offlineBadge').classList.add('visible'));
-  if (!navigator.onLine) document.getElementById('offlineBadge').classList.add('visible');
+  setupInstallBanner();
+  
+  window.addEventListener('online', () => {
+    document.getElementById('offlineBadge').classList.remove('visible');
+  });
+  window.addEventListener('offline', () => {
+    document.getElementById('offlineBadge').classList.add('visible');
+  });
+  if (!navigator.onLine) {
+    document.getElementById('offlineBadge').classList.add('visible');
+  }
 });
 
 function registerSW() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(err => console.log('SW error:', err));
   }
 }
 
 // === Storage ===
 function loadProducts() {
   try {
-    products = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch { products = []; }
+    const data = localStorage.getItem(STORAGE_KEY);
+    products = data ? JSON.parse(data) : [];
+  } catch (e) {
+    products = [];
+  }
 }
 
 function saveProducts() {
@@ -39,8 +50,7 @@ function genId() {
 }
 
 function genBarcode() {
-  // Generate unique 13-digit barcode
-  const prefix = '2000'; // shop prefix
+  const prefix = '2000';
   const rand = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
   return prefix + rand;
 }
@@ -48,7 +58,10 @@ function genBarcode() {
 // === CRUD ===
 function saveProduct() {
   const name = document.getElementById('pName').value.trim();
-  if (!name) { toast('⚠️ نام جنس را وارد کنید'); return; }
+  if (!name) {
+    showToast('⚠️ نام جنس را وارد کنید');
+    return;
+  }
 
   const price = parseInt(document.getElementById('pPrice').value) || 0;
   const category = document.getElementById('pCategory').value.trim();
@@ -60,7 +73,7 @@ function saveProduct() {
     if (idx >= 0) {
       products[idx] = { ...products[idx], name, price, category, barcode, stock, updated: Date.now() };
     }
-    toast('✅ ویرایش شد');
+    showToast('✅ ویرایش شد');
     editingId = null;
     document.getElementById('formTitle').textContent = '➕ افزودن جنس جدید';
     document.getElementById('cancelBtn').style.display = 'none';
@@ -69,7 +82,7 @@ function saveProduct() {
       id: genId(), name, price, category, barcode, stock,
       created: Date.now(), updated: Date.now()
     });
-    toast('✅ جنس اضافه شد');
+    showToast('✅ جنس اضافه شد');
   }
 
   saveProducts();
@@ -81,6 +94,7 @@ function saveProduct() {
 function editProduct(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
+  
   editingId = id;
   document.getElementById('pName').value = p.name;
   document.getElementById('pPrice').value = p.price || '';
@@ -105,7 +119,7 @@ function deleteProduct(id) {
   saveProducts();
   renderProducts();
   updateStats();
-  toast('🗑️ حذف شد');
+  showToast('🗑️ حذف شد');
 }
 
 function clearForm() {
@@ -125,7 +139,11 @@ function renderProducts() {
 
   const el = document.getElementById('productList');
   if (!filtered.length) {
-    el.innerHTML = `<div class="empty"><div class="icon">📦</div><div>${q ? 'نتیجه‌ای یافت نشد' : 'هنوز جنسی اضافه نشده'}</div></div>`;
+    el.innerHTML = `
+      <div class="empty">
+        <div class="icon">📦</div>
+        <div>${q ? 'نتیجه‌ای یافت نشد' : 'هنوز جنسی اضافه نشده'}</div>
+      </div>`;
     return;
   }
 
@@ -134,9 +152,9 @@ function renderProducts() {
       <div class="product-info">
         <div class="product-name">${esc(p.name)}</div>
         <div class="product-meta">
-          ${p.price ? '💰 ' + p.price.toLocaleString('fa') + ' تومان' : ''}
-          ${p.category ? ' · 📁 ' + esc(p.category) : ''}
-          ${p.stock ? ' · 📦 ' + p.stock : ''}
+          ${p.price ? `<span>💰 ${p.price.toLocaleString('fa')} تومان</span>` : ''}
+          ${p.category ? `<span>📁 ${esc(p.category)}</span>` : ''}
+          ${p.stock ? `<span>📦 ${p.stock}</span>` : ''}
         </div>
       </div>
       <div class="product-actions">
@@ -181,7 +199,8 @@ function showBarcode(id) {
       lineColor: '#000000'
     });
   } catch (e) {
-    document.getElementById('barcodeOutput').innerHTML = `<div style="color:red">خطا در تولید بارکد: ${e.message}</div>`;
+    document.getElementById('barcodeOutput').innerHTML = 
+      `<div style="color:var(--danger);padding:20px">خطا: ${e.message}</div>`;
   }
 
   document.getElementById('barcodeModal').classList.add('active');
@@ -193,7 +212,8 @@ function showQR(id) {
   currentProduct = p;
 
   document.getElementById('qrModalTitle').textContent = '📱 QR Code - ' + p.name;
-  document.getElementById('qrLabel').textContent = `${p.name} | ${p.price ? p.price.toLocaleString('fa') + ' تومان' : ''}`;
+  document.getElementById('qrLabel').textContent = 
+    `${p.name} | ${p.price ? p.price.toLocaleString('fa') + ' تومان' : ''}`;
   document.getElementById('qrOutput').innerHTML = '';
 
   const qrData = JSON.stringify({
@@ -203,14 +223,19 @@ function showQR(id) {
     category: p.category
   });
 
-  new QRCode(document.getElementById('qrOutput'), {
-    text: qrData,
-    width: 200,
-    height: 200,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.M
-  });
+  try {
+    new QRCode(document.getElementById('qrOutput'), {
+      text: qrData,
+      width: 200,
+      height: 200,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch (e) {
+    document.getElementById('qrOutput').innerHTML = 
+      `<div style="color:var(--danger);padding:20px">خطا: ${e.message}</div>`;
+  }
 
   document.getElementById('qrModal').classList.add('active');
 }
@@ -219,38 +244,45 @@ function showQR(id) {
 function downloadBarcode() {
   const svg = document.getElementById('barcodeSvg');
   if (!svg) return;
+  
   const svgData = new XMLSerializer().serializeToString(svg);
   const canvas = document.createElement('canvas');
-  canvas.width = svg.width.baseVal.value * 2;
-  canvas.height = svg.height.baseVal.value * 2;
   const ctx = canvas.getContext('2d');
   const img = new Image();
+  
   img.onload = () => {
+    canvas.width = img.width * 2;
+    canvas.height = img.height * 2;
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
     const a = document.createElement('a');
     a.download = `barcode-${currentProduct?.name || 'unknown'}.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
-    toast('📥 دانلود شد');
+    showToast('📥 دانلود شد');
   };
+  
+  img.onerror = () => showToast('❌ خطا در دانلود');
   img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
 }
 
 function downloadQR() {
   const img = document.querySelector('#qrOutput img');
   if (!img) return;
+  
   const a = document.createElement('a');
   a.download = `qr-${currentProduct?.name || 'unknown'}.png`;
   a.href = img.src;
   a.click();
-  toast('📥 دانلود شد');
+  showToast('📥 دانلود شد');
 }
 
 function printBarcode() {
   const svg = document.getElementById('barcodeSvg');
   if (!svg) return;
+  
   const svgData = new XMLSerializer().serializeToString(svg);
   const win = window.open('', '_blank');
   win.document.write(`
@@ -266,8 +298,13 @@ function printBarcode() {
 }
 
 // === Close Modals ===
-function closeModal() { document.getElementById('barcodeModal').classList.remove('active'); }
-function closeQRModal() { document.getElementById('qrModal').classList.remove('active'); }
+function closeModal() {
+  document.getElementById('barcodeModal').classList.remove('active');
+}
+
+function closeQRModal() {
+  document.getElementById('qrModal').classList.remove('active');
+}
 
 // Close on overlay click
 document.addEventListener('click', e => {
@@ -277,11 +314,39 @@ document.addEventListener('click', e => {
 });
 
 // === Helpers ===
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
 
-function toast(msg) {
+function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// === PWA Install ===
+let deferredPrompt;
+
+function setupInstallBanner() {
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+}
+
+function installApp() {
+  if (!deferredPrompt) {
+    showToast('از منوی مرورگر "افزودن به صفحه اصلی" را بزنید');
+    return;
+  }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      showToast('✅ اپ نصب شد');
+    }
+    deferredPrompt = null;
+  });
 }

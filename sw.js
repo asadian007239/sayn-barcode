@@ -1,11 +1,12 @@
-const CACHE_NAME = 'sayn-barcode-v1';
+const CACHE_NAME = 'sayn-barcode-v2';
 const ASSETS = [
-  '/barcode/',
-  '/barcode/assets/style.css',
-  '/barcode/assets/app.js',
-  '/barcode/lib/JsBarcode.all.min.js',
-  '/barcode/lib/qrcode.min.js',
-  '/barcode/assets/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './lib/JsBarcode.all.min.js',
+  './lib/qrcode.min.js'
 ];
 
 self.addEventListener('install', e => {

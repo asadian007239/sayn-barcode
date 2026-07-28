@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#e94560">
+  <meta name="theme-color" content="#1a1a2e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="بارکد ساین">
   <title>بارکد ساین</title>
-  <link rel="manifest" href="/barcode/assets/manifest.json">
-  <link rel="stylesheet" href="/barcode/assets/style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Offline Badge -->
@@ -66,7 +67,7 @@
 
     <!-- Search -->
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="جستجوی جنس..." oninput="renderProducts()">
+      <input type="text" id="searchInput" placeholder="🔍 جستجوی جنس..." oninput="renderProducts()">
     </div>
 
     <!-- Product List -->
@@ -103,8 +104,9 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script src="/barcode/lib/JsBarcode.all.min.js"></script>
-  <script src="/barcode/lib/qrcode.min.js"></script>
-  <script src="/barcode/assets/app.js"></script>
+  <!-- Scripts with correct relative paths -->
+  <script src="lib/JsBarcode.all.min.js"></script>
+  <script src="lib/qrcode.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
